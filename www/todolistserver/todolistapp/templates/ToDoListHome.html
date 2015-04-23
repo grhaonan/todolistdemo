@@ -1,0 +1,237 @@
+<!DOCTYPE>
+
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %}To-Do-List-Demo{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ToDoListDemo">
+    <meta name="author" content="Dustinliu">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+
+    <!--Insert Jquery 2.1.3 JS-->
+    <script src="/static/JS/Jquery/jquery-2.1.3.min.js"></script>
+
+    <!-- Insert JqueryUI JS-->
+    <script src="/static/JS/JqueryUi/jquery-ui.min.js"></script>
+
+
+    <!-- Insert Customer Defined JS-->
+    <!--<script src="../static/JS/staticJS/MainJS.js"></script>-->
+
+
+
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="/static/boostrap/css/bootstrap.min.css">
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="/static/boostrap/js/bootstrap.min.js"></script>
+    <!-- <link rel="stylesheet" href="../static/boostrap/js/bootstrap.min.js"> -->
+
+    <!--FontAwsome 3.2.1.2-->
+    <link rel="stylesheet" href="/static/FontAwesome/css/font-awesome.min.css">
+
+    <!--Insert Customerized CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/custerizedCSS/Todolist.css">
+
+
+    <!-- Insert Nprogress Bar -->
+    <script src="/static/JS/nprogress/nprogress.js"></script>
+    <link rel="stylesheet" href="/static/JS/nprogress/nprogress.css">
+
+
+
+    <script type="text/javascript">
+        function sendtwitter(){
+            $('#myModal form').submit(function(){
+                NProgress.start();
+                NProgress.done();
+
+                $.ajax({
+                    type: "POST",
+                    data: $('#myModal form').serialize(),
+                    url: "{% url "add" %}",
+                    cache: false,
+                    dataType: "html",
+                    success: function(html, textStatus) {
+                        $('#todo').replaceWith(html);
+                        $('#myModal').modal('hide');
+                        $('#myModal form')[0].reset();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $('#comment_form form').replaceWith('Your comment was unable to be posted at this time.  We apologise for the inconvenience.');
+                    }
+                });
+                return false;
+                });
+        }
+        $(document).ready(function(){
+            sendtwitter();
+        })
+    </script>
+
+
+
+
+
+</head>
+
+<body>
+    <!--Design the Nav bar with  collapsed feature-->
+    <nav class="navbar-wrapper navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#home-nav-bar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+
+                </button>
+                <a class="navbar-brand" href="#"></a>
+            </div>
+        <!--Collect Toggle links, forms and other content-->
+            <div class="navbar-collapse collapse" id="home-nav-bar">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="active"><a href="#"><i class="icon-signin icon-large"></i> Sign Up</a></li>
+                    <li><a href="#"><i class="icon-user icon-large"></i> Sign In</a></li>
+                </ul>
+            </div><!--Navbar-collapsed-feature-->
+        </div><!--container-->
+    </nav>
+
+    <!--Define Cover-->
+    <div class="header" style="background-image:url(/static/img/Cover.jpg)" >
+        <div class="container">
+            <div class="row">
+                <div class="logotxt2">
+                    <!--<h1>WorkFlow To Do List</h1>-->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add To Do List Manuel-->
+
+    <div class="container">
+        <div class="row">
+            <div class="span8 offset2">
+                {% block todo%}
+                <div id="todo" class="well well-lg">
+                    <!-- use bootstrap css to light the table content-->
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <td>
+                                    <h3 class="text-primary text-center"> To do list, own your time</h2>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for todo in todolist %}
+                        {%if todo.priority == '1'%}
+                        <tr class="danger">
+                        {%endif%}
+                        {%if todo.priority == '2'%}
+                        <tr class="warning">
+                        {%endif%}
+                        {%if todo.priority == '3'%}
+                        <tr class="info">
+                        {%endif%}
+                            <td>{{todo.todo}}</td>
+                            <td class="te">
+                                <div class="span3">
+                                    <a href="{% url "finish" todo.id%}" title="finish"><i class="icon-ok"></i></a>
+                                    <!--<a class="icon-edit" role="button" data-target="#myUpdate" data-toggle="modal"></a>-->
+                                    <a href="{% url "update" todo.id%}" title="update"><i class="icon-edit"></i></a>
+                                    <a href="{% url "delete" todo.id%}" title="delete"><i class="icon-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% for ftodo in finishtodos %}
+                        <tr class="success">
+                            <td class="ftodo muted"> {{ftodo.todo}}</td>
+                            <td class="te">
+                                <div class="span3">
+                                    <a href="{% url "backout" ftodo.id%}" title="redo"><i class="icon-refresh"></i></a>
+                                    <!--<a class="icon-edit" role="button" data-target="#myUpdate" data-toggle="modal"></a>-->
+                                    <a href="{% url "update" ftodo.id%}" title="update"><i class="icon-edit"></i></a>
+                                    <a href="{% url "delete" ftodo.id%}" title="delete"><i class="icon-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <a class="btn btn-primary" role="button" data-target="#myModal" data-toggle="modal"><i class="glyphicon glyphicon-plus"></i><span>ADD New</span></a>
+                {%endblock%}
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--Define a dynamic modal for adding new To-Do list Content-->
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="test-primary"> Add A New To Do</h4>
+                </div>
+                <form action="" method="post">
+                <div class="modal-body">
+                    <!--<div class="input-group input-group-lg">-->
+                        <textarea name="todo" class="modifytextarea" id="txtodo" required="required">{{ todo.todo }}</textarea>
+                      <!-- <span class="input-group-addon" id="basic-addon1"><i class="icon-tag"></i></span>-->
+                        <!--<input type="text" class="form-control" placeholder="Type in" aria-describedby="basic-addon1" value="{{todo.todo}}">-->
+                        <fieldset>
+                            <label class="radio-inline" for="priority">
+                                <span class="label label-info">Priority</span>
+                            </label>
+                            <label class="radio-inline" for="priority">
+                                <input type="radio" name="priority" value="1">
+                                <span class="label label-danger">High</span>
+                            </label>
+                            <label class="radio-inline" for="priority">
+                                <input type="radio" name="priority" value="2">
+                                <span class="label label-warning">Medium</span>
+                            </label>
+                            <label class="radio-inline" for="priority">
+                                <input type="radio" name="priority" value="3">
+                                <span class="label label-success">Low</span>
+                            </label>
+                        </fieldset>
+                    <!--</div>-->
+                    </div>
+                <!--Define Footer-->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success" id="send" name="submit">Save</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--Define update page -->
+
+
+
+    <!-- Insert Stikup Jquery To Fix Navbar-->
+    <script src="/static/JS/stickUp/stickUp.min.js"></script>
+    <script type="text/javascript">
+        jQuery(function($) {
+            $(document).ready( function() {
+                $('.navbar-wrapper').stickUp();
+            });
+        });
+    </script>
+</body>
+
+</html>
