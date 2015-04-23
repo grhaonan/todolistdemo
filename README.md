@@ -1,1 +1,14 @@
-# ToDoList
+# ToDoListDemo
+
+
++www-------
+  +todolistserver-------
+	 +todolist - basic Django setting for todolistdemo
+	 +todolistapp
+	   +templates
+	     + htmls
+	   +static
+	      +css, JS, bootstrap
+	   +views.py
+	   +models.py
+	 +manager.py  - Django server
